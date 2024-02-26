@@ -1,27 +1,46 @@
-# Project Name
+# React Vite Docker Project
 
 ## Introduction
 
-This project is a React application set up using Vite as the build tool, following the [DigitalOcean tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-react-project-with-vite). Vite provides a fast development environment, enabling features like hot module replacement and efficient builds for production. This application serves as a starting point for developing React applications with an optimized toolchain.
+This project is a React application created using Vite. The setup includes Docker configuration for containerization, ensuring consistency across development and deployment environments.
 
-## Features
+## Getting Started
 
-- React 17+ setup with Vite
-- ESLint for code linting
-- Prettier for code formatting
-- Example React component and Vite configuration
-- Hot Module Replacement (HMR) for instant feedback during development
+These instructions will cover setup, building, and running the project locally and in a Docker container.
 
-## Prerequisites
+### Prerequisites
 
-Before you begin, ensure you have the following installed on your system:
-- Node.js (version 12.x or higher)
-- npm/yarn (latest version)
+- Node.js (version 20.x or higher)
+- Docker (latest version)
 
-## Installation
+## Local Development Setup
 
-To get this project up and running locally, follow these steps:
+1. Clone the repository:
+`git clone https://yourprojecturl.git your-project-directory`
 
-1. Clone the repository to your local machine:
-   ```bash
-   git clone https://yourprojecturl.git
+1. Navigate to the project directory:
+`cd your-project-directory`
+
+1. Install dependencies:
+`npm install`
+
+1. Start the development server:
+`npm run dev`
+
+1. Visit http://localhost:5173 to view your application.
+
+## Docker Setup
+
+1. Build the Docker Image: 
+`docker build -t do_react_vite .`
+This uses the `.dockerignore` and `Dockerfile` in the root of your project.
+
+1. Run the Docker Container: 
+`docker run -p 3000:3000 do_react_vite`
+Run your Docker container mapping the port to the one exposed in the Dockerfile.
+
+1. Visit http://localhost:3000 to view your application running in the Docker container.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details.
