@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  react-vite-app:
+    container_name: react_vite_app_prod_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    command: ["serve", "-s", "dist", "-l", "3000"]
