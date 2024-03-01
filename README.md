@@ -8,6 +8,28 @@ This project is a React application created using Vite. The setup includes Docke
 
 These instructions will cover setup, building, and running the project locally and in a Docker container, as well as using Docker Compose for a simplified orchestration process.
 
+## Directory Structure
+
+This section outlines the directory and file structure of the React Vite Docker Project. Understanding this structure is helpful for navigating and modifying the project effectively.
+
+```plaintext
+do_react_vite/
+├── Dockerfile # Docker configuration for building the image
+├── README.md # Project documentation
+├── docker-compose.yaml # Docker Compose configuration for orchestrating containers
+├── index.html # Entry point for the Vite application
+├── package-lock.json # NPM lock file ensuring consistent installs across machines
+├── package.json # NPM package configuration, including scripts and dependencies
+├── public # Public assets that are not processed by Vite
+│ └── vite.svg # Example SVG asset
+├── src # Source code for the React application
+│ ├── App.jsx # Main React application component
+│ ├── components # Reusable React components
+│ ├── css # CSS files for styling the application
+│ ├── img # Image assets used within the application
+│ └── main.jsx # Entry point for the React application
+└── vite.config.js # Configuration file for Vite
+
 ### Prerequisites
 
 - Node.js (version 20.x or higher)
