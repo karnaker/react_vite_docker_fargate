@@ -99,12 +99,10 @@ Run the script to set environment variables:
 ```bash
 source ./scripts/set_env_vars.sh
 ```
-This will automatically configure the necessary AWS credentials and other environment variables for the project.
+This will automatically configure the necessary environment variables for the project.
 
 ## Infrastructure Setup with OpenTofu
 To initialize and apply your infrastructure with OpenTofu, follow these steps:
-
-Ensure AWS credentials are set by running set_env_vars.sh as described above.
 
 Run the OpenTofu setup script:
 
