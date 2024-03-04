@@ -24,7 +24,8 @@ do_react_vite/
 ├── env_vars.conf # Environment variables configuration (not tracked by Git)
 ├── index.html # Entry point HTML file for the Vite application
 ├── infrastructure
-│   └── main.tf # Terraform (or OpenTofu) infrastructure as code configuration
+│   ├── main.tf # OpenTofu (or Terraform) infrastructure as code configuration
+│   └── dev.tfvars # OpenTofu (or Terraform) variables file for development environment (not tracked by Git)
 ├── package-lock.json # NPM lock file ensuring consistent installs across machines
 ├── package.json # NPM package configuration, including scripts and dependencies
 ├── public
@@ -102,15 +103,18 @@ source ./scripts/set_env_vars.sh
 This will automatically configure the necessary environment variables for the project.
 
 ## Infrastructure Setup with OpenTofu
-To initialize and apply your infrastructure with OpenTofu, follow these steps:
 
-Run the OpenTofu setup script:
+Before applying your infrastructure with OpenTofu, ensure you have the necessary configuration for your environment:
+
+Download the `dev.tfvars` file from 1Password and place it in the `./infrastructure` folder within your project directory. This file contains environment-specific variables that are essential for your infrastructure setup.
+
+To initialize and apply your infrastructure with OpenTofu, follow these steps, making sure to include the `-var-file="dev.tfvars"` option to specify the use of your variables file:
 
 ```bash
-./scripts/run_tofu_with_1pass.sh tofu plan
+./scripts/run_tofu_with_1pass.sh tofu plan -var-file="dev.tfvars"
 ```
 ```bash
-./scripts/run_tofu_with_1pass.sh tofu apply
+./scripts/run_tofu_with_1pass.sh tofu apply -var-file="dev.tfvars"
 ```
 
 ## License

@@ -1,3 +1,20 @@
+# Define variables to make the infrastructure configuration more flexible and reusable
+variable "ami_id" {
+  description = "The AMI ID of the EC2 instance"
+}
+
+variable "instance_type" {
+  description = "The instance type of the EC2 instance"
+}
+
+variable "environment" {
+  description = "The deployment environment (e.g., Development, Staging, Production)"
+}
+
+variable "project_name" {
+  description = "The name of the project for resource tagging"
+}
+
 # Configure the AWS provider with the specified region
 provider "aws" {
   region = "us-east-1"
@@ -5,8 +22,8 @@ provider "aws" {
 
 # Define an AWS EC2 instance resource
 resource "aws_instance" "app_server" {
-  ami           = "ami-07d9b9ddc6cd8dd30" # Use the AMI ID specified in the variable
-  instance_type = "t2.nano"               # Use the instance type specified in the variable
+  ami           = var.ami_id          # Use the AMI ID specified in the variable
+  instance_type = var.instance_type   # Use the instance type specified in the variable
 
   # Configure the instance to use IMDSv2 for enhanced security
   metadata_options {
@@ -23,7 +40,7 @@ resource "aws_instance" "app_server" {
   # Tag the instance with metadata for identification and management
   tags = {
     Name        = "AppServer"
-    Environment = "Development"
-    Project     = "do_react_vite"
+    Environment = var.environment
+    Project     = var.project_name
   }
 }
