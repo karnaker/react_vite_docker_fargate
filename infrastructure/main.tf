@@ -54,7 +54,24 @@ resource "aws_security_group" "app_server_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.allowed_ssh_cidr]
   }
+
+  # Ingress rule for HTTP traffic from a specified IP address
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.allowed_ssh_cidr] # Reuse SSH IP variable for HTTP access
+  }
   
+  # Optional: Ingress rule for HTTPS traffic from a specified IP address
+  # Consider implementing if you decide to use self-signed certificates or if you acquire a domain in the future
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.allowed_ssh_cidr] # Reuse SSH IP variable for HTTPS access
+  }
+
   # Egress rule to allow all outbound traffic
   egress {
     from_port   = 0

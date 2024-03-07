@@ -116,7 +116,9 @@ To initialize and apply your infrastructure with OpenTofu, follow these steps, m
 ```bash
 ./scripts/run_tofu_with_1pass.sh tofu apply -var-file="dev.tfvars"
 ```
-
+```bash
+./scripts/run_tofu_with_1pass.sh tofu destroy -var-file="dev.tfvars"
+```
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
