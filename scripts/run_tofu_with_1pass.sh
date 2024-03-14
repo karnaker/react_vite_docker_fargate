@@ -4,10 +4,8 @@
 DIR="$(dirname "$0")"  # Get the directory where the script is located
 source "$DIR/set_env_vars.sh"
 
-# Define the directory where your OpenTofu configuration (.tf files) is located
-INFRASTRUCTURE_DIR="./infrastructure"
-
-#!/bin/bash
+# This will be set based on script arguments
+INFRASTRUCTURE_DIR=""
 
 # Function to fetch AWS credentials from 1Password using environment variables
 fetch_aws_credentials() {
@@ -32,16 +30,15 @@ fetch_aws_credentials() {
     fi
 }
 
-
-# Function to change to the infrastructure directory and run OpenTofu command
+# Function to change to the specified infrastructure directory and run OpenTofu command
 run_opentofu_command_in_infrastructure() {
     if [[ -z $AWS_ACCESS_KEY_ID ]] || [[ -z $AWS_SECRET_ACCESS_KEY ]]; then
         echo "AWS credentials not found. Aborting..."
         exit 1
     fi
 
-    # Change to the infrastructure directory
-    echo "Changing to infrastructure directory: $INFRASTRUCTURE_DIR"
+    # Change to the specified infrastructure subdirectory
+    echo "Changing to infrastructure subdirectory: $INFRASTRUCTURE_DIR"
     cd "$INFRASTRUCTURE_DIR" || exit
 
     # Run the OpenTofu command passed to the script
@@ -51,10 +48,14 @@ run_opentofu_command_in_infrastructure() {
 
 # Main function to orchestrate the script's flow
 main() {
-    if [ "$#" -lt 1 ]; then
-        echo "Usage: $0 <opentofu_command> [args...]"
+    if [ "$#" -lt 2 ]; then
+        echo "Usage: $0 <infrastructure_subdir> <opentofu_command> [args...]"
         exit 1
     fi
+
+    # First argument is the subdirectory under infrastructure
+    INFRASTRUCTURE_DIR="./infrastructure/$1"
+    shift  # Remove the first argument so "$@" now contains the OpenTofu command and its arguments
 
     fetch_aws_credentials
     run_opentofu_command_in_infrastructure "$@"
