@@ -106,7 +106,7 @@ do_react_vite/
 
 Before running OpenTofu, you need to configure environment variables securely:
 
-Download the env_vars.conf file from 1Password and place it in the root of your project directory. Make sure this file is listed in your .gitignore to avoid exposing sensitive information.
+Download the `env_vars.conf` file from 1Password and place it in the root of your project directory. Make sure this file is listed in your .gitignore to avoid exposing sensitive information.
 
 Run the script to set environment variables:
 ```bash
@@ -118,18 +118,18 @@ This will automatically configure the necessary environment variables for the pr
 
 Before applying your infrastructure with OpenTofu, ensure you have the necessary configuration for your environment:
 
-Download the `dev.tfvars` file from 1Password and place it in the `./infrastructure` folder within your project directory. This file contains environment-specific variables that are essential for your infrastructure setup.
+Download the `ec2_dev.tfvars` and `ecs_fargate_dev.tfvars` files from 1Password and place each file in the appropriate `./infrastructure` subfolder within your project directory. The tfvars files contain environment-specific variables that are essential for your infrastructure setup.
 
-To initialize and apply your infrastructure with OpenTofu, follow these steps, making sure to include the `-var-file="dev.tfvars"` option to specify the use of your variables file:
+To initialize and apply your infrastructure with OpenTofu, follow these steps, making sure to include the `-var-file="*.tfvars"` option to specify the use of your variables file, for example:
 
 ```bash
-./scripts/run_tofu_with_1pass.sh tofu plan -var-file="dev.tfvars"
+./scripts/run_tofu_with_1pass.sh ec2 tofu plan -var-file="ec2_dev.tfvars"
 ```
 ```bash
-./scripts/run_tofu_with_1pass.sh tofu apply -var-file="dev.tfvars"
+./scripts/run_tofu_with_1pass.sh ec2 tofu apply -var-file="ec2_dev.tfvars"
 ```
 ```bash
-./scripts/run_tofu_with_1pass.sh tofu destroy -var-file="dev.tfvars"
+./scripts/run_tofu_with_1pass.sh ec2 tofu destroy -var-file="ec2_dev.tfvars"
 ```
 ## License
 
