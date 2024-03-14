@@ -24,8 +24,12 @@ do_react_vite/
 ├── env_vars.conf # Environment variables configuration (not tracked by Git)
 ├── index.html # Entry point HTML file for the Vite application
 ├── infrastructure
-│   ├── main.tf # OpenTofu (or Terraform) infrastructure as code configuration
-│   └── dev.tfvars # OpenTofu (or Terraform) variables file for development environment (not tracked by Git)
+│   ├── ec2
+│   │   ├── main.tf # OpenTofu (or Terraform) IaC config for EC2 infrastructure
+│   │   └── ec2_dev.tfvars # Variables file for EC2 environment (not tracked by Git)
+│   └── ecs_fargate
+│       ├── main.tf # OpenTofu (or Terraform) IaC config for ECS Fargate infrastructure
+│       └── ecs_fargate_dev.tfvars # Variables file for ECS Fargate environment (not tracked by Git)
 ├── package-lock.json # NPM lock file ensuring consistent installs across machines
 ├── package.json # NPM package configuration, including scripts and dependencies
 ├── public
