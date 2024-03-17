@@ -21,16 +21,23 @@ load_variables_from_tfvars() {
     load_variables_from_tfvars "./infrastructure/ecs_fargate/ecs_fargate_dev.tfvars"
 }
 
+# Define a function to build and tag the Docker image
+build_and_tag_image() {
+    echo "Building Docker image for linux/arm64..."
+    docker buildx build --platform linux/arm64 -t $PROJECT_NAME .
+
+    echo "Tagging Docker image..."
+    docker tag $PROJECT_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${PROJECT_NAME}_${ENVIRONMENT}_repository:latest
+}
+
 # Define main deployment function
 deploy_to_ecr() {
     # Authenticate Docker to AWS ECR
     echo "Authenticating Docker with AWS ECR..."
     aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-    # Build and tag Docker image
-    echo "Building and tagging Docker image..."
-    docker build -t $PROJECT_NAME .
-    docker tag $PROJECT_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${PROJECT_NAME}_${ENVIRONMENT}_repository:latest
+    # Build and tag Docker image for arm64
+    build_and_tag_image
 
     # Push Docker image to ECR
     echo "Pushing Docker image to AWS ECR..."
