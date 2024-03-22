@@ -9,3 +9,8 @@ variable "project_name" {
 variable "environment" {
   description = "The deployment environment (e.g., development, staging, production)."
 }
+
+variable "availability_zones" {
+  description = "List of availability zones in the region for high availability"
+  type        = list(string)
+}
