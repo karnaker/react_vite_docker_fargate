@@ -33,6 +33,7 @@ resource "aws_lb_target_group" "vite_tg" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.vite_vpc.id
+  target_type = "ip" # Specify target type as IP to be compatible with awsvpc network mode
 
   health_check {
     protocol            = "HTTP"
