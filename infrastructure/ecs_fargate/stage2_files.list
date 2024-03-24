@@ -1,1 +1,2 @@
+fargate_service.tf
 task_definition.tf
