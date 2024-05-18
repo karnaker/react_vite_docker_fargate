@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Path to the key-value configuration file
 CONFIG_FILE="env_vars.conf"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Source environment variables and fetch AWS credentials
 DIR="$(dirname "$0")" # Get the directory where the script is located

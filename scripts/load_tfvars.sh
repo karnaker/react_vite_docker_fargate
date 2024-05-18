@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script to load variables from a Terraform variables file (tfvars)
 
@@ -32,4 +32,4 @@ load_variables_from_tfvars() {
 # load_variables_from_tfvars "./infrastructure/ecs_fargate/ecs_fargate_dev.tfvars"
 
 # Uncomment the line below to execute the function with a specific tfvars file
-# load_variables_from_tfvars "./infrastructure/ecs_fargate/ecs_fargate_dev.tfvars"
+load_variables_from_tfvars "$1"

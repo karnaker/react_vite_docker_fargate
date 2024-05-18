@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Function to fetch AWS credentials from 1Password using environment variables
 fetch_aws_credentials() {

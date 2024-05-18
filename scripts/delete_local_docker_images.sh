@@ -1,31 +1,45 @@
-#!/bin/bash
+#!/bin/sh
+# delete_local_docker_images.sh - Script to delete local Docker images
 
-# Load variables from the tfvars file
-source ./scripts/load_tfvars.sh
-load_variables_from_tfvars "./infrastructure/ecs_fargate/ecs_fargate_dev.tfvars"
+# Function to load variables from a user-specified tfvars file
+load_variables() {
+    local tfvars_path="$1"
+    if [ -f "$tfvars_path" ]; then
+        source ./scripts/load_tfvars.sh "$tfvars_path"
+    else
+        echo "Error: Specified tfvars file '$tfvars_path' does not exist."
+        exit 1
+    fi
+}
 
 # Function to delete Docker images related to the project
 delete_project_images() {
-    # Fetch all images tagged with the project name and remove them
-    PROJECT_IMAGES=$(docker images "$PROJECT_NAME" -q)
+    echo "Fetching Docker images for the project: $PROJECT_NAME..."
+    local project_images=$(docker images "$PROJECT_NAME" -q)
 
-    if [ -z "$PROJECT_IMAGES" ]; then
-        echo "No Docker images found for the project: $PROJECT_NAME"
+    if [ -z "$project_images" ]; then
+        echo "No Docker images found for the project: $PROJECT_NAME."
     else
-        echo "Deleting Docker images for the project: $PROJECT_NAME"
-        for image_id in $PROJECT_IMAGES; do
-            docker rmi -f "$image_id" || echo "Failed to delete image with ID $image_id"
+        echo "Deleting Docker images for the project: $PROJECT_NAME..."
+        for image_id in $project_images; do
+            docker rmi -f "$image_id" && echo "Deleted image with ID: $image_id" || echo "Failed to delete image with ID: $image_id"
         done
         echo "Docker images deletion attempt completed."
     fi
 }
 
-# Main function
+# Main function to orchestrate the script execution
 main() {
-    echo "Starting to delete local Docker images created by deploy_to_ecr.sh..."
+    if [ "$#" -ne 1 ]; then
+        echo "Usage: $0 <path_to_tfvars>"
+        exit 1
+    fi
+
+    echo "Starting to delete local Docker images..."
+    load_variables "$1"
     delete_project_images
-    echo "Deletion attempt process completed."
+    echo "Deletion process completed."
 }
 
-# Execute main function
-main
+# Execute main function with all passed arguments
+main "$@"
