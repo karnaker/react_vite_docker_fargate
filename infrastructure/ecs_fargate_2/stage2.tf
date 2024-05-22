@@ -1,4 +1,35 @@
 ##################################################
+# ecs_cluster.tf (for now in main.tf)
+# This section creates an AWS ECS Cluster which will host our Fargate services
+
+resource "aws_ecs_cluster" "ecs_cluster" {
+  name = "${var.project_name}-${var.environment}-cluster"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-cluster"
+    Environment = var.environment
+    Project     = var.project_name
+    OpenTofu    = var.opentofu_enabled
+  }
+}
+
+##################################################
+# cloudwatch_log_group.tf (for now in main.tf)
+# CloudWatch Log Group for storing logs from ECS tasks
+resource "aws_cloudwatch_log_group" "cloudwatch_log_group" {
+  name = "/ecs/${var.project_name}/${var.environment}"
+  
+  retention_in_days = 30
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-log-group"
+    Environment = var.environment
+    Project     = var.project_name
+    OpenTofu    = var.opentofu_enabled
+  }
+}
+
+##################################################
 # ecs_fargate_service.tf (for now in main.tf)
 # This section defines an AWS ECS service using Fargate as the launch type. 
 # This service is responsible for managing the lifecycle of containers based on the defined task definition.
@@ -39,22 +70,6 @@ resource "aws_ecs_service" "ecs_service" {
 }
 
 ##################################################
-# cloudwatch_log_group.tf (for now in main.tf)
-# CloudWatch Log Group for storing logs from ECS tasks
-resource "aws_cloudwatch_log_group" "cloudwatch_log_group" {
-  name = "/ecs/${var.project_name}/${var.environment}"
-  
-  retention_in_days = 30
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-log-group"
-    Environment = var.environment
-    Project     = var.project_name
-    OpenTofu    = var.opentofu_enabled
-  }
-}
-
-##################################################
 # ecs_task_definition.tf (for now in main.tf)
 # ECS Task Definition for the Fargate service
 resource "aws_ecs_task_definition" "ecs_task" {
@@ -76,7 +91,11 @@ resource "aws_ecs_task_definition" "ecs_task" {
       name      = "${var.project_name}"
       image     = "${aws_ecr_repository.ecr_repository.repository_url}:latest"
       essential = true
-      
+      portMappings = [
+        {
+          containerPort = 3000
+        }
+      ],
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -134,21 +153,6 @@ data "aws_iam_policy" "ecs_task_execution_role_policy" {
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = data.aws_iam_policy.ecs_task_execution_role_policy.arn
-}
-
-##################################################
-# ecs_cluster.tf (for now in main.tf)
-# This section creates an AWS ECS Cluster which will host our Fargate services
-
-resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "${var.project_name}-${var.environment}-cluster"
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-cluster"
-    Environment = var.environment
-    Project     = var.project_name
-    OpenTofu    = var.opentofu_enabled
-  }
 }
 
 ##################################################
