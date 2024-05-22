@@ -3,19 +3,19 @@
 # This section defines an AWS ECS service using Fargate as the launch type. 
 # This service is responsible for managing the lifecycle of containers based on the defined task definition.
 
-resource "aws_ecs_service" "do_react_vite_service" {
-  name            = "${var.project_name}_${var.environment}_service"
-  cluster         = aws_ecs_cluster.do_react_vite_cluster.id
-  task_definition = aws_ecs_task_definition.do_react_vite_task.arn
+resource "aws_ecs_service" "ecs_service" {
+  name            = "${var.project_name}-${var.environment}-service"
+  cluster         = aws_ecs_cluster.ecs_cluster.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
   launch_type     = "FARGATE"
-  desired_count    = 1  # Define how many instances of the task should run
+  desired_count   = 1  # Define how many instances of the task should run
 
   network_configuration {
     assign_public_ip = false
 
     security_groups  = [
-      aws_security_group.egress_all.id,
-      aws_security_group.ingress_api.id
+      aws_security_group.security_group_egress_all.id,
+      aws_security_group.security_group_ingress_api.id
     ]
 
     subnets          = [
@@ -25,14 +25,13 @@ resource "aws_ecs_service" "do_react_vite_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.do_react_vite_target_group.arn
+    target_group_arn = aws_lb_target_group.lb_target_group.arn
     container_name   = var.project_name
     container_port   = 3000
   }
   
-  # Tags for resource identification and management in AWS
   tags = {
-    Name        = "${var.project_name}_${var.environment}_service"
+    Name        = "${var.project_name}-${var.environment}-service"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -42,13 +41,13 @@ resource "aws_ecs_service" "do_react_vite_service" {
 ##################################################
 # cloudwatch_log_group.tf (for now in main.tf)
 # CloudWatch Log Group for storing logs from ECS tasks
-resource "aws_cloudwatch_log_group" "do_react_vite_log_group" {
+resource "aws_cloudwatch_log_group" "cloudwatch_log_group" {
   name = "/ecs/${var.project_name}/${var.environment}"
   
-  retention_in_days = 30  # Defines how long logs are kept; adjust as needed
+  retention_in_days = 30
 
   tags = {
-    Name        = "${var.project_name}_${var.environment}_log_group"
+    Name        = "${var.project_name}-${var.environment}-log-group"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -58,12 +57,12 @@ resource "aws_cloudwatch_log_group" "do_react_vite_log_group" {
 ##################################################
 # ecs_task_definition.tf (for now in main.tf)
 # ECS Task Definition for the Fargate service
-resource "aws_ecs_task_definition" "do_react_vite_task" {
-  family                   = "${var.project_name}_${var.environment}"
+resource "aws_ecs_task_definition" "ecs_task" {
+  family                   = "${var.project_name}-${var.environment}"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"  # Minimum vCPU for Fargate
-  memory                   = "512"  # Minimum memory in MiB for Fargate
+  cpu                      = "256"
+  memory                   = "512"
   runtime_platform {
     cpu_architecture        = "ARM64"
     operating_system_family = "LINUX"
@@ -75,13 +74,13 @@ resource "aws_ecs_task_definition" "do_react_vite_task" {
   container_definitions = jsonencode([
     {
       name      = "${var.project_name}"
-      image     = "${aws_ecr_repository.do_react_vite_repository.repository_url}:latest"
+      image     = "${aws_ecr_repository.ecr_repository.repository_url}:latest"
       essential = true
       
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.do_react_vite_log_group.name
+          awslogs-group         = aws_cloudwatch_log_group.cloudwatch_log_group.name
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "ecs"
         }
@@ -90,7 +89,7 @@ resource "aws_ecs_task_definition" "do_react_vite_task" {
   ])
 
   tags = {
-    Name        = "${var.project_name}_${var.environment}_task"
+    Name        = "${var.project_name}-${var.environment}-task"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -141,11 +140,11 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy_attach
 # ecs_cluster.tf (for now in main.tf)
 # This section creates an AWS ECS Cluster which will host our Fargate services
 
-resource "aws_ecs_cluster" "do_react_vite_cluster" {
-  name = "${var.project_name}_${var.environment}_cluster"
+resource "aws_ecs_cluster" "ecs_cluster" {
+  name = "${var.project_name}-${var.environment}-cluster"
 
   tags = {
-    Name        = "${var.project_name}_${var.environment}_cluster"
+    Name        = "${var.project_name}-${var.environment}-cluster"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -156,19 +155,19 @@ resource "aws_ecs_cluster" "do_react_vite_cluster" {
 # alb.tf (for now in main.tf)
 # Application Load Balancer (ALB) for distributing traffic to the Fargate service
 
-resource "aws_lb_target_group" "do_react_vite_target_group" {
+resource "aws_lb_target_group" "lb_target_group" {
   name        = "${var.project_name}-${var.environment}-tg"
   port        = 3000
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_vpc.do_react_vite_vpc.id
+  vpc_id      = aws_vpc.vpc.id
 
   health_check {
     enabled = true
     path    = "/health"
   }
 
-  depends_on = [aws_alb.do_react_vite_alb]
+  depends_on = [aws_alb.alb]
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-tg"
@@ -178,7 +177,7 @@ resource "aws_lb_target_group" "do_react_vite_target_group" {
   }
 }
 
-resource "aws_alb" "do_react_vite_alb" {
+resource "aws_alb" "alb" {
   name               = "${var.project_name}-${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
@@ -189,9 +188,9 @@ resource "aws_alb" "do_react_vite_alb" {
   ]
 
   security_groups = [
-    aws_security_group.http.id,
-    aws_security_group.https.id,
-    aws_security_group.egress_all.id,
+    aws_security_group.security_group_http.id,
+    aws_security_group.security_group_https.id,
+    aws_security_group.security_group_egress_all.id,
   ]
 
   depends_on = [aws_internet_gateway.igw]
@@ -204,20 +203,20 @@ resource "aws_alb" "do_react_vite_alb" {
   }
 }
 
-resource "aws_alb_listener" "do_react_vite_http_listener" {
-  load_balancer_arn = aws_alb.do_react_vite_alb.arn
+resource "aws_alb_listener" "http_listener" {
+  load_balancer_arn = aws_alb.alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.do_react_vite_target_group.arn
+    target_group_arn = aws_lb_target_group.lb_target_group.arn
   }
 }
 
 output "alb_url" {
   description = "URL of the Application Load Balancer"
-  value       = "http://${aws_alb.do_react_vite_alb.dns_name}"
+  value       = "http://${aws_alb.alb.dns_name}"
 }
 
 ##################################################
@@ -227,11 +226,11 @@ output "alb_url" {
 # Create a VPC
 # Define a VPC (Virtual Private Cloud) that provides a logically isolated
 # section of the AWS Cloud where you can launch AWS resources.
-resource "aws_vpc" "do_react_vite_vpc" {
+resource "aws_vpc" "vpc" {
   cidr_block = "10.0.0.0/16"
 
   tags = {
-    Name        = "${var.project_name}_${var.environment}_vpc"
+    Name        = "${var.project_name}-${var.environment}-vpc"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -242,12 +241,12 @@ resource "aws_vpc" "do_react_vite_vpc" {
 # Define both public and private subnets across at least two 
 # Availability Zones (AZs) to ensure high availability and fault tolerance.
 resource "aws_subnet" "public_subnet_1" {
-  vpc_id            = aws_vpc.do_react_vite_vpc.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_public_subnet_1"
+    Name        = "${var.project_name}-${var.environment}-public-subnet-1"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -255,12 +254,12 @@ resource "aws_subnet" "public_subnet_1" {
 }
 
 resource "aws_subnet" "private_subnet_1" {
-  vpc_id            = aws_vpc.do_react_vite_vpc.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_private_subnet_1"
+    Name        = "${var.project_name}-${var.environment}-private-subnet-1"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -268,12 +267,12 @@ resource "aws_subnet" "private_subnet_1" {
 }
 
 resource "aws_subnet" "public_subnet_2" {
-  vpc_id            = aws_vpc.do_react_vite_vpc.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.3.0/24"
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_public_subnet_2"
+    Name        = "${var.project_name}-${var.environment}-public-subnet-2"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -281,12 +280,12 @@ resource "aws_subnet" "public_subnet_2" {
 }
 
 resource "aws_subnet" "private_subnet_2" {
-  vpc_id            = aws_vpc.do_react_vite_vpc.id
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.4.0/24"
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_private_subnet_2"
+    Name        = "${var.project_name}-${var.environment}-private-subnet-2"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -297,10 +296,10 @@ resource "aws_subnet" "private_subnet_2" {
 # Define routing for public and private subnets, associating each with the
 # correct resources.
 resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.do_react_vite_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_public_route_table"
+    Name        = "${var.project_name}-${var.environment}-public-route-table"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -308,10 +307,10 @@ resource "aws_route_table" "public_route_table" {
 }
 
 resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.do_react_vite_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_private_route_table"
+    Name        = "${var.project_name}-${var.environment}-private-route-table"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -346,10 +345,10 @@ resource "aws_eip" "nat_eip" {
 }
 
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.do_react_vite_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_igw"
+    Name        = "${var.project_name}-${var.environment}-igw"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -363,7 +362,7 @@ resource "aws_nat_gateway" "ngw" {
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
-    Name = "${var.project_name}_${var.environment}_ngw"
+    Name        = "${var.project_name}-${var.environment}-ngw"
     Environment = var.environment
     Project     = var.project_name
     OpenTofu    = var.opentofu_enabled
@@ -384,10 +383,10 @@ resource "aws_route" "private_ngw" {
 
 # Security Groups
 # Define security groups for various levels of access control.
-resource "aws_security_group" "http" {
+resource "aws_security_group" "security_group_http" {
   name        = "http"
   description = "HTTP traffic"
-  vpc_id      = aws_vpc.do_react_vite_vpc.id
+  vpc_id      = aws_vpc.vpc.id
 
   ingress {
     from_port   = 80
@@ -397,10 +396,10 @@ resource "aws_security_group" "http" {
   }
 }
 
-resource "aws_security_group" "https" {
+resource "aws_security_group" "security_group_https" {
   name        = "https"
   description = "HTTPS traffic"
-  vpc_id      = aws_vpc.do_react_vite_vpc.id
+  vpc_id      = aws_vpc.vpc.id
 
   ingress {
     from_port   = 443
@@ -410,10 +409,10 @@ resource "aws_security_group" "https" {
   }
 }
 
-resource "aws_security_group" "egress_all" {
+resource "aws_security_group" "security_group_egress_all" {
   name        = "egress-all"
   description = "Allow all outbound traffic"
-  vpc_id      = aws_vpc.do_react_vite_vpc.id
+  vpc_id      = aws_vpc.vpc.id
 
   egress {
     from_port   = 0
@@ -423,10 +422,10 @@ resource "aws_security_group" "egress_all" {
   }
 }
 
-resource "aws_security_group" "ingress_api" {
+resource "aws_security_group" "security_group_ingress_api" {
   name        = "ingress-api"
   description = "Allow ingress to API"
-  vpc_id      = aws_vpc.do_react_vite_vpc.id
+  vpc_id      = aws_vpc.vpc.id
 
   ingress {
     from_port   = 3000
@@ -435,4 +434,3 @@ resource "aws_security_group" "ingress_api" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
