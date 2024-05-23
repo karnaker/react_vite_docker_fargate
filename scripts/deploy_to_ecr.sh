@@ -35,7 +35,7 @@ build_and_tag_image() {
     docker buildx build --platform linux/arm64 -t $PROJECT_NAME .
 
     echo "Tagging Docker image..."
-    docker tag $PROJECT_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${PROJECT_NAME}_${ENVIRONMENT}_repository:latest
+    docker tag $PROJECT_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${PROJECT_NAME}-${ENVIRONMENT}-repository:latest
 }
 
 # Main deployment function that coordinates the authentication, building, tagging, and pushing of the Docker image
@@ -46,7 +46,7 @@ deploy_to_ecr() {
     build_and_tag_image
 
     echo "Pushing Docker image to AWS ECR..."
-    docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${PROJECT_NAME}_${ENVIRONMENT}_repository:latest
+    docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${PROJECT_NAME}-${ENVIRONMENT}-repository:latest
 
     echo "Docker image successfully pushed to AWS ECR."
 }

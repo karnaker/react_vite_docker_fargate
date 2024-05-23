@@ -32,15 +32,15 @@ load_variables_from_tfvars() {
 
 # Function to delete Docker images from AWS ECR
 delete_ecr_images() {
-     echo "Fetching list of image digests from ${PROJECT_NAME}_${ENVIRONMENT}_repository..."
-    IMAGE_DIGESTS=$(aws ecr list-images --repository-name ${PROJECT_NAME}_${ENVIRONMENT}_repository --region $AWS_REGION --query 'imageIds[*].imageDigest' --output text)
+     echo "Fetching list of image digests from ${PROJECT_NAME}-${ENVIRONMENT}-repository..."
+    IMAGE_DIGESTS=$(aws ecr list-images --repository-name ${PROJECT_NAME}-${ENVIRONMENT}-repository --region $AWS_REGION --query 'imageIds[*].imageDigest' --output text)
 
     if [ -z "$IMAGE_DIGESTS" ]; then
-        echo "No images found in ${PROJECT_NAME}_${ENVIRONMENT}_repository."
+        echo "No images found in ${PROJECT_NAME}-${ENVIRONMENT}-repository."
         return
     fi
 
-    echo "The following image digests will be deleted from ${PROJECT_NAME}_${ENVIRONMENT}_repository:"
+    echo "The following image digests will be deleted from ${PROJECT_NAME}-${ENVIRONMENT}-repository:"
     echo $IMAGE_DIGESTS
     read -p "Are you sure you want to delete these images? (y/N): " -n 1 -r
     echo    # Move to a new line
@@ -52,7 +52,7 @@ delete_ecr_images() {
     # Deleting images
     for DIGEST in $IMAGE_DIGESTS; do
         echo "Deleting image with digest: $DIGEST"
-        aws ecr batch-delete-image --repository-name ${PROJECT_NAME}_${ENVIRONMENT}_repository --region $AWS_REGION --image-ids imageDigest=$DIGEST
+        aws ecr batch-delete-image --repository-name ${PROJECT_NAME}-${ENVIRONMENT}-repository --region $AWS_REGION --image-ids imageDigest=$DIGEST
         if [ $? -eq 0 ]; then
             echo "Successfully deleted image with digest: $DIGEST"
         else
