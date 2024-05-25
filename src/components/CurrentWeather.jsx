@@ -10,7 +10,7 @@ export default function CurrentWeather() {
     const fetchWeatherData = async () => {
       try {
         const response = await fetch(
-          'https://api.open-meteo.com/v1/forecast?latitude=40.769883744600065&longitude=-73.98379341590314&current_weather=true&temperature_unit=fahrenheit&wind_speed_unit=mph'
+          'https://api.open-meteo.com/v1/forecast?latitude=40.77&longitude=-73.98&current_weather=true&temperature_unit=fahrenheit&wind_speed_unit=mph'
         );
         const data = await response.json();
         setWeatherData(data);
