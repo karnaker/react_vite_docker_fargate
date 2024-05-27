@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Renames files in a directory based on a list of file names and an action (include or exclude)
-# Usage: ./scripts/rename_stage_files.sh <directory_path> <include|exclude> <list_file_name>...
+# Usage: ./scripts/rename_stage_files.sh <include|exclude> <directory_path> <list_file_name>...
 
 # Ensures there is a newline at the end of the file
 ensure_newline() {
@@ -16,11 +16,14 @@ rename_file() {
 
     local current_file="${directory}${file}"
     
-    if [ "$action" = "exclude" ]; then
-        [ -f "$current_file" ] && mv "$current_file" "${current_file}.exclude"
-    elif [ "$action" = "include" ]; then
-        [ -f "${current_file}.exclude" ] && mv "${current_file}.exclude" "$current_file"
-    fi
+    case "$action" in
+        exclude)
+            [ -f "$current_file" ] && mv "$current_file" "${current_file}.exclude"
+            ;;
+        include)
+            [ -f "${current_file}.exclude" ] && mv "${current_file}.exclude" "$current_file"
+            ;;
+    esac
 }
 
 # Renames files based on the list file and action
@@ -40,10 +43,10 @@ process_list_file() {
 
 # Main script execution
 main() {
-    [ $# -lt 3 ] && { echo "Usage: $0 <directory_path> <include|exclude> <list_file_name>..."; exit 1; }
+    [ $# -lt 3 ] && { echo "Usage: $0 <include|exclude> <directory_path> <list_file_name>..."; exit 1; }
     
-    local directory="$1"
-    local action="$2"
+    local action="$1"
+    local directory="$2"
     shift 2
     
     [ "${directory: -1}" != "/" ] && directory+="/"
