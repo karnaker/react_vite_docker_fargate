@@ -32,6 +32,11 @@ variable "project_name" {
   type        = string  # Define type to improve validation and error handling.
 }
 
+variable "domain_name" {
+  description = "The domain name for the project"
+  type        = string
+}
+
 ##################################################
 # ecr_repository.tf (for now in main.tf)
 # This file creates an AWS Elastic Container Registry (ECR) repository to store Docker images.
