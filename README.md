@@ -1,4 +1,4 @@
-# React Vite Docker Project
+# React Vite Docker Fargate Project
 
 ## Introduction
 
@@ -10,7 +10,7 @@ These instructions will cover setup, building, and running the project locally a
 
 ## Directory Structure
 
-This section outlines the directory and file structure of the React Vite Docker Project. Understanding this structure is helpful for navigating and modifying the project effectively.
+This section outlines the directory and file structure of the React Vite Docker Fargate Project. Understanding this structure is helpful for navigating and modifying the project effectively.
 
 ```plaintext
 do_react_vite/
@@ -269,16 +269,18 @@ To initialize and apply your infrastructure with OpenTofu, follow these steps, m
 
 This project was made possible thanks to the following resources:
 
-- **Useful Article**: ["Hello, world - The Fargate/Terraform tutorial I wish I had" by Jimmy Sawczuk](https://section411.com/2019/07/hello-world/). This article provided invaluable guidance on deploying applications to AWS Fargate using Terraform.
+- **Useful Articles**:
+  - ["Hello, world - The Fargate/Terraform tutorial I wish I had" by Jimmy Sawczuk](https://section411.com/2019/07/hello-world/). This article provided invaluable guidance on deploying applications to AWS Fargate using Terraform.
+  - ["How To Set Up a React Project with Vite" by Tamal Chowdhury and Caitlin Postal](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-react-project-with-vite). This article was instrumental in setting up the React project with Vite.
+
+- **API**:
+  - [Open-Meteo API](https://open-meteo.com/): Open-Meteo is an open-source weather API that offers free access for non-commercial use, without requiring an API key. We use it for the /weather endpoint of the app.
 
 - **External Libraries and Frameworks**:
   - [React](https://reactjs.org/)
   - [Vite](https://vitejs.dev/)
   - [Docker](https://www.docker.com/)
   - [OpenTofu](https://www.opentofu.org/)
-
-- **API**:
-  - [Open-Meteo API](https://open-meteo.com/): Open-Meteo is an open-source weather API that offers free access for non-commercial use, without requiring an API key. We use it for the /weather endpoint of the app.
 
 ## License
 
